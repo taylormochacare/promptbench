@@ -32,7 +32,7 @@
         "resizable": true,
         "acceptFirstMouse": true,
         "windowEffects": {
-          "effects": ["hudWindow", "mica"],
+          "effects": ["underWindowBackground", "mica"],
           "state": "followsWindowActiveState"
         }
       }

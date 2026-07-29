@@ -9,7 +9,12 @@ export function useWindowChrome() {
     if (!isTauri()) return;
 
     void import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
-      void getCurrentWindow().setTitle("");
+      // Clear the HTML document title at runtime for overlay titlebar chrome.
+      getCurrentWindow()
+        .setTitle("")
+        .catch((error: unknown) => {
+          console.warn("Failed to clear window title", error);
+        });
     });
   }, []);
 }
