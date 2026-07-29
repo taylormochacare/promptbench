@@ -1,51 +1,31 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { Logo } from "@/components/logo";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { useWindowChrome } from "@/hooks/use-window-chrome";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+export default function App() {
+  useWindowChrome();
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
+    <div className="flex min-h-svh flex-col bg-background/40 text-foreground">
+      <header
+        className="sticky top-0 z-10 select-none border-b border-border/40 bg-background/35 pl-[72px] backdrop-blur-md"
+        data-tauri-drag-region="deep"
       >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Logo />
+          <div data-tauri-drag-region="false">
+            <ThemeSwitcher />
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 sm:px-6">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-border/50 bg-muted/55 px-6 py-16 backdrop-blur-sm sm:px-10">
+          <p className="text-center font-heading text-2xl font-medium tracking-tight sm:text-3xl">
+            Hello World
+          </p>
+        </div>
+      </main>
+    </div>
   );
 }
-
-export default App;
