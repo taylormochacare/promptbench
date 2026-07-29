@@ -27,10 +27,10 @@ function applyTheme(theme: Theme) {
   root.style.colorScheme = theme;
 }
 
-function getStoredTheme(): Theme {
+function getStoredTheme(fallback: Theme): Theme {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "dark" || stored === "light") return stored;
-  return DEFAULT_THEME;
+  return fallback;
 }
 
 interface ThemeProviderProps {
@@ -44,7 +44,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === "undefined") return defaultTheme;
-    return getStoredTheme();
+    return getStoredTheme(defaultTheme);
   });
 
   useEffect(() => {
