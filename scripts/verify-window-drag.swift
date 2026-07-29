@@ -1,6 +1,16 @@
 import AppKit
+import ApplicationServices
 import CoreGraphics
 import Foundation
+
+let accessibilityPrompt = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+guard AXIsProcessTrustedWithOptions(accessibilityPrompt) else {
+  fputs(
+    "Accessibility permission required. Enable this process in System Settings → Privacy & Security → Accessibility, then rerun.\n",
+    stderr
+  )
+  exit(1)
+}
 
 func runAppleScript(_ source: String) -> String? {
   var error: NSDictionary?

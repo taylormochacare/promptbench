@@ -67,31 +67,45 @@ const inner = makeElement("div");
 const logo = makeElement("div");
 const themeWrap = makeElement("div", { "data-tauri-drag-region": "false" });
 const button = makeElement("button");
+const bareRegion = makeElement("div", { "data-tauri-drag-region": "" });
+const bareTrueRegion = makeElement("div", { "data-tauri-drag-region": "true" });
+const bareChild = makeElement("span");
 
 const cases = [
   {
     name: "header padding (direct hit on header)",
     path: [header],
-    bare: true,
-    deep: true,
+    expected: true,
   },
   {
     name: "logo area (child of deep header)",
     path: [logo, inner, header],
-    bare: false,
-    deep: true,
+    expected: true,
   },
   {
     name: "center titlebar empty space (inner div)",
     path: [inner, header],
-    bare: false,
-    deep: true,
+    expected: true,
   },
   {
     name: "theme switcher button (clickable, excluded by false wrapper)",
     path: [button, themeWrap, inner, header],
-    bare: false,
-    deep: false,
+    expected: false,
+  },
+  {
+    name: "bare region direct hit",
+    path: [bareRegion],
+    expected: true,
+  },
+  {
+    name: "bare region child hit (shallow only)",
+    path: [bareChild, bareRegion],
+    expected: false,
+  },
+  {
+    name: "bare true attr direct hit",
+    path: [bareTrueRegion],
+    expected: true,
   },
 ];
 
@@ -99,7 +113,7 @@ let failed = 0;
 
 for (const testCase of cases) {
   const result = isDragRegion(testCase.path);
-  const expected = testCase.deep;
+  const expected = testCase.expected;
   const ok = result === expected;
   if (!ok) failed += 1;
   console.log(`${ok ? "PASS" : "FAIL"} ${testCase.name}: expected=${expected}, got=${result}`);

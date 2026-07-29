@@ -23,10 +23,10 @@ function assert(name, condition) {
   console.log(`PASS ${name}`);
 }
 
-assert('header uses data-tauri-drag-region="deep"', /data-tauri-drag-region": "deep"/.test(source));
+assert('header uses data-tauri-drag-region="deep"', /data-tauri-drag-region="deep"/.test(source));
 assert(
   "theme switcher is excluded from drag",
-  /data-tauri-drag-region": "false"/.test(source),
+  /data-tauri-drag-region="false"/.test(source),
 );
 
 if (failed > 0) {
