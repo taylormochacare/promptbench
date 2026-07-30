@@ -10,11 +10,31 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "promptbench",
-        "width": 800,
-        "height": 600
+        "label": "main",
+        "title": "",
+        "hiddenTitle": true,
+        "transparent": true,
+        "titleBarStyle": "Overlay",
+        "decorations": true,
+        "trafficLightPosition": {
+          "x": 16,
+          "y": 20
+        },
+        "width": 1440,
+        "height": 900,
+        "minWidth": 960,
+        "minHeight": 640,
+        "center": true,
+        "maximized": true,
+        "resizable": true,
+        "acceptFirstMouse": true,
+        "windowEffects": {
+          "effects": ["underWindowBackground", "mica"],
+          "state": "followsWindowActiveState"
+        }
       }
     ],
     "security": {
