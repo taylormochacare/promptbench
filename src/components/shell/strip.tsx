@@ -1,5 +1,5 @@
 import { PanelLeft, Columns2 } from "lucide-react";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { SettingsTrigger } from "@/components/shell/settings-panel";
 import { sessionStore, useSession } from "@/stores/session-store";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +42,7 @@ export function Strip() {
         )}
       </div>
       <div className="flex-1" />
-      <div className="flex items-center gap-2" data-tauri-drag-region="false">
+      <div className="flex items-center gap-1" data-tauri-drag-region="false">
         {uiZoom !== 1 && (
           <button
             type="button"
@@ -54,7 +54,7 @@ export function Strip() {
             {zoomLabel}
           </button>
         )}
-        <ThemeSwitcher />
+        <SettingsTrigger tone="strip" />
       </div>
     </header>
   );
