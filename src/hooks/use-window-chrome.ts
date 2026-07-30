@@ -48,15 +48,25 @@ export function useWindowChrome() {
 
       await Promise.all([syncReduceTransparency(), syncFullscreen()]);
 
-      unlisteners.push(
-        await win.onFocusChanged(({ payload: focused }) => {
-          root.toggleAttribute("data-window-inactive", !focused);
-          // Cheap poll point for the accessibility setting — no native
-          // notification observer yet; re-check whenever focus returns.
-          if (focused) void syncReduceTransparency();
-        }),
-      );
-      unlisteners.push(await win.onResized(() => void syncFullscreen()));
+      // Unmount can land between any of these awaits: re-check `disposed`
+      // after each registration and immediately unlisten if it did.
+      const register = (unlisten: () => void) => {
+        if (disposed) unlisten();
+        else unlisteners.push(unlisten);
+      };
+      try {
+        register(
+          await win.onFocusChanged(({ payload: focused }) => {
+            root.toggleAttribute("data-window-inactive", !focused);
+            // Cheap poll point for the accessibility setting — no native
+            // notification observer yet; re-check whenever focus returns.
+            if (focused) void syncReduceTransparency();
+          }),
+        );
+        register(await win.onResized(() => void syncFullscreen()));
+      } catch (error) {
+        console.warn("window listener registration failed", error);
+      }
     })();
 
     return () => {

@@ -119,6 +119,23 @@ create index prompt_runs_analytics_idx on prompt_runs (user_id, model, created_a
 create unique index prompt_runs_one_best_per_version on prompt_runs (version_id)
   where is_best;
 
+-- Promoting a best run must clear the incumbent first or the partial unique
+-- index raises. This function owns that ordering in one transaction; clients
+-- call it via RPC instead of flipping is_best directly. Runs with invoker
+-- rights, so RLS still applies.
+create or replace function set_best_run(run_id uuid)
+returns void
+language sql
+security invoker
+as $$
+  update prompt_runs
+     set is_best = false
+   where is_best
+     and id <> run_id
+     and version_id = (select version_id from prompt_runs where id = run_id);
+  update prompt_runs set is_best = true where id = run_id;
+$$;
+
 -- ── updated_at ──────────────────────────────────────────────────────────
 create or replace function set_updated_at()
 returns trigger language plpgsql as $$
