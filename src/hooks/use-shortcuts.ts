@@ -20,8 +20,13 @@ export function useShellShortcuts() {
         return;
       }
       if (event.code === "Digit1" || event.code === "Digit2") {
-        event.preventDefault();
-        sessionStore.focusPane(event.code === "Digit1" ? 0 : 1);
+        const index = event.code === "Digit1" ? 0 : 1;
+        // Only claim the shortcut when the pane exists — a no-op ⌘2 in
+        // single-pane mode shouldn't swallow the key.
+        if (index < panePages.length) {
+          event.preventDefault();
+          sessionStore.focusPane(index);
+        }
         return;
       }
       // ⌘W closes the focused pane when split; single-pane stays native.

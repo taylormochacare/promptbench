@@ -72,7 +72,9 @@ export function PaneContainer() {
     if (!container) return;
     event.preventDefault();
     const { left, width } = container.getBoundingClientRect();
-    const minRatio = Math.max(0.2, PANE_MIN / width);
+    // Cap at 0.5 so narrow windows (< 2×PANE_MIN) degrade to a locked
+    // 50/50 divider instead of a crossed clamp range that jams the drag.
+    const minRatio = Math.min(0.5, Math.max(0.2, PANE_MIN / width));
     const target = event.currentTarget as HTMLElement;
     target.setPointerCapture(event.pointerId);
 
