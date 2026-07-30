@@ -21,7 +21,7 @@
         "decorations": true,
         "trafficLightPosition": {
           "x": 16,
-          "y": 20
+          "y": 18
         },
         "width": 1440,
         "height": 900,
@@ -32,7 +32,7 @@
         "resizable": true,
         "acceptFirstMouse": true,
         "windowEffects": {
-          "effects": ["underWindowBackground", "mica"],
+          "effects": ["sidebar"],
           "state": "followsWindowActiveState"
         }
       }
