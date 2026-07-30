@@ -25,6 +25,16 @@ function applyTheme(theme: Theme) {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   root.style.colorScheme = theme;
+
+  // Sync the NSWindow so the native vibrancy material matches the app theme
+  // (dark app over light-OS material renders mud — design-direction §1.1).
+  if ("__TAURI_INTERNALS__" in window) {
+    void import("@tauri-apps/api/window").then(({ getCurrentWindow }) =>
+      getCurrentWindow()
+        .setTheme(theme)
+        .catch((error: unknown) => console.warn("setTheme failed", error)),
+    );
+  }
 }
 
 function getStoredTheme(fallback: Theme): Theme {
