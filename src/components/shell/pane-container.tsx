@@ -1,44 +1,59 @@
 import { useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { PageBody } from "@/components/shell/pane-content";
+import { pageDisplayTitle, pageTypeInfo } from "@/lib/page-types";
 import { sessionStore, useSession } from "@/stores/session-store";
+import { usePage, useTree } from "@/stores/tree-store";
 import { cn } from "@/lib/utils";
 
 const PANE_MIN = 360;
 
 function EmptyPane() {
+  const hasPages = useTree().length > 0;
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4">
       <Logo />
-      <p className="text-muted-foreground">The bench is ready.</p>
+      <p className="text-muted-foreground">
+        {hasPages ? "Pick a page from the rail." : "Create your first page."}
+      </p>
       <p className="text-[11px] text-muted-foreground/60">
-        <kbd className="rounded-[5px] border border-border px-1.5 py-0.5 font-mono text-[10px]">
-          ⌥⌘G
-        </kbd>{" "}
-        glass smoke test
+        {hasPages ? "⌥-click a page to open it split" : "The + button in the rail, top left"}
       </p>
     </div>
   );
 }
 
 function Pane({ index, split }: { index: number; split: boolean }) {
-  const { focusedPane } = useSession();
+  const { focusedPane, panePages } = useSession();
   const focused = focusedPane === index;
+  const page = usePage(panePages[index] ?? null);
+  const info = page ? pageTypeInfo(page.type) : null;
+  const Icon = info?.icon;
 
   return (
     <section
       className="flex h-full min-w-0 flex-1 flex-col"
       onPointerDown={() => sessionStore.focusPane(index)}
     >
-      {/* Pane header — 28px: breadcrumb placeholder + hover close when split */}
+      {/* Pane header — 28px: breadcrumb + hover close when split */}
       <header className="group flex h-7 shrink-0 items-center justify-between px-3">
         <span
           className={cn(
-            "truncate text-xs",
+            "flex min-w-0 items-center gap-1.5 truncate text-xs",
             focused ? "text-foreground" : "text-muted-foreground",
           )}
         >
-          Untitled
+          {Icon && (
+            <Icon
+              className="size-3.5 shrink-0"
+              style={focused && info ? { color: info.tint } : undefined}
+              aria-hidden
+            />
+          )}
+          <span className="truncate">
+            {page ? pageDisplayTitle(page.title) : "—"}
+          </span>
         </span>
         {split && (
           <button
@@ -52,7 +67,7 @@ function Pane({ index, split }: { index: number; split: boolean }) {
         )}
       </header>
       <div className="min-h-0 flex-1">
-        <EmptyPane />
+        {page ? <PageBody page={page} /> : <EmptyPane />}
       </div>
     </section>
   );
