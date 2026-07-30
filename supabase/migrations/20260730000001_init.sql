@@ -224,5 +224,19 @@ create index page_versions_user_idx on page_versions (user_id);
 create index prompt_versions_user_idx on prompt_versions (user_id);
 create index prompt_runs_user_idx on prompt_runs (user_id);
 
+-- ── Grants: explicit, because auto-expose is disabled ───────────────────
+-- The project is created with "Automatically expose new tables" OFF
+-- (Supabase's own recommendation), so Data API roles get nothing by
+-- default. Access is granted table-by-table, to authenticated only —
+-- anon deliberately gets no grants; promptbench has no anonymous surface.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on table
+  repos, pages, page_versions, prompt_versions, prompt_runs
+  to authenticated;
+grant execute on function
+  set_best_run(uuid),
+  commit_prompt_version(uuid, text, jsonb, integer, text, text, boolean)
+  to authenticated;
+
 -- Deferred, deliberately: search_text tsvector projection (palette content
 -- search), page_links (backlinks), workspaces, release_labels.
