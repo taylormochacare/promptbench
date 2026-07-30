@@ -76,7 +76,7 @@ Content storage is deliberately non-uniform. Three of four pillars aren't block-
 
 These make "plain JSON, not CRDT" a best practice rather than merely expedient, and they are cheap now and expensive later:
 
-1. **Every content blob carries `schema_version`; load is always `migrate(raw)`.** Migration #1 ships the day the schema lands, even as a no-op.
+1. **Every content blob carries a schema version; load is always `migrate(raw)`.** Migration #1 ships the day the schema lands, even as a no-op. Two spellings, on purpose, at a layer boundary: the SQL columns are `schema_version` (Postgres convention) and the TypeScript envelope field is `content.schemaVersion` — they carry the same number and the mapping happens at the client boundary.
 2. **Session state never enters the version envelope.** Camera, selection, pane layout, scroll — local only, never versioned.
 3. **Mutations flow through a per-pillar store emitting discrete operations.** Storage adapters swap easily; mutation discipline does not. Skipping this means adopting Yjs later rewrites every editor.
 
@@ -112,14 +112,16 @@ The ladder is the spine of this document. Each milestone has **exit criteria tha
 
 | # | Milestone | Exit criteria | State |
 |---|---|---|---|
-| **M0** | Foundation | Design direction authored and reviewed · window materials + config deltas landed · token system in place · glass smoke test rendering over the bench · perf gate (120Hz sheet scroll, busy wallpaper, both themes) green | ✅ built — perf gate **unmeasured** (§8 #2) |
+| **M0** | Foundation | Design direction authored and reviewed · window materials + config deltas landed · token system in place · glass smoke test rendering over the bench · perf gate (120Hz sheet scroll, busy wallpaper, both themes) green | ⚠️ built, **not exited** — perf gate unmeasured (§8 #2) |
 | **M1** | Shell + stores | Rail tree, strip, pane container (n=1/n=2 with divider), drag regions, fullscreen + window-inactive contracts, toasts, button set, empty state #1 · session store, tree index store, content envelope + migration #1, op-store skeletons, page-type registry · command palette (names + types) · native menu bar mirroring every shortcut · motion pass (press states, hover law, tree animation, reduced motion) | 🔨 in progress |
 | **M2** | **The daily driver** | Prompt session page running against real Supabase with two providers (Anthropic HTTP stream + codex CLI) · single-user magic-link auth + first-run · well/commit/run contract · results grid with per-column status, stop, cost/latency/token chips · History panel with batch rows · stores persist to Supabase behind the unchanged op-store seam | ⬜ not started |
-| **M3** | File binding | `repos` registry + machine-local root map · bind/unbind a prompt page · Rust fs watcher on content hash · conflict banner (Theirs / Mine / Diff), no auto-merge · commit stamps `bound_hash` + git HEAD + dirty flag · honest-caveat footer on bound pages | ⬜ |
+| **M3** | File binding | `repos` registry + machine-local root map · bind/unbind a prompt page · Rust fs watcher on content hash · conflict banner (Theirs / Mine / Diff), no auto-merge · commit stamps `bound_hash` + git HEAD + dirty flag · **commit recovery semantics decided and written down (§8 #6)** · honest-caveat footer on bound pages | ⬜ |
 | **M4** | Docs | Real rich-text editor (TipTap leaning — decision open, §8) · slash menu + selection toolbar · snapshot history + restore via `migrate(load(row))` · content migration module proven by a real migration | ⬜ |
 | **M5** | Mermaid | Split source/preview on the **shared** shell splitter · debounced re-render that never blanks on error · theme via `themeVariables` at render time, `%%{init}%%` forbidden in stored source · opaque export | ⬜ |
 | **M6** | Canvas | Excalidraw embedded · scene-differ synthesizing ops into the canvas store · `elements[] + files` persisted, `appState` discarded · local save indicator · export on `--background` at export time | ⬜ |
 | **M7** | AI assist | *Improve this draft* returning a diff (accept/reject, never auto-apply) · generate N variants as runnable drafts · draft test cases · mermaid-from-description · all of it as an internal consumer of the run layer, with `prompt_runs.source = 'assist'` · meta-prompts are themselves bound prompt pages | ⬜ |
+
+**State legend.** ✅ exited (every criterion checked) · ⚠️ built but **not exited** — code has landed and an exit criterion is still open · 🔨 in progress · ⬜ not started. "Built" is never "done": a milestone exits on its criteria, not on how finished it feels.
 
 **Why this order.** M2 before docs/canvas because it is the only milestone that answers §2's test, and because the relational path is the riskiest thing to discover late. Canvas last because the engine boundary is the riskiest seam. AI assist last because it consumes everything below it.
 
@@ -213,7 +215,8 @@ Ordered by when the answer is needed.
 | 3 | Rich-text engine: TipTap confirmed? | M4 | Leaning TipTap (ProseMirror underneath, JSON doc format slots into the envelope + op-store). Lexical younger, raw ProseMirror artisanal |
 | 4 | Does the tree get nesting + drag-reorder in M1 or M2? | M1 exit | Schema and design support it; the rail renders flat today |
 | 5 | When do the stores actually cut from localStorage to Supabase? | M2 | Client exists and is unconsumed by design; the op-store seam is the cut line |
-| 6 | Is `starred` / `is_best` enough, or does the workbench need evals? | post-M2 | Evals explicitly deferred; both columns ship with no "feeds evals" promise |
+| 6 | What are the recovery semantics of a bound Commit? | M3 | "One gesture" spans a filesystem write and a database insert and cannot be atomic. Needs an ordering, an idempotent retry, and a partial-failure story — file written but `prompt_versions` stale, or the reverse. Unowned; do not invent it at implementation time |
+| 7 | Is `starred` / `is_best` enough, or does the workbench need evals? | post-M2 | Evals explicitly deferred; both columns ship with no "feeds evals" promise |
 
 ---
 
@@ -240,7 +243,7 @@ Append one entry per cycle: what shipped, what changed in the ladder, what the n
 
 ### Cycle 1 — opened 2026-07-30
 
-- **Shipped since repo open (2026-07-29):** M0 complete; M1 roughly two-thirds through — shell, stores, tree CRUD, typed page bodies, split panes. Supabase project created and migration #1 written with RLS, grants, and two invariant RPCs.
+- **Shipped since repo open (2026-07-29):** M0 built but **not exited** — its perf gate is unmeasured; M1 roughly two-thirds through — shell, stores, tree CRUD, typed page bodies, split panes. Supabase project created and migration #1 written with RLS, grants, and two invariant RPCs.
 - **Ladder:** first written down here. M1–M7 formalized from the working milestone sketch; the `M2`/`M4`/`M5`/`M6` markers already scattered through the code comments now resolve to real definitions.
 - **Named this cycle:** the palette/menu-bar gap (§6 drift), and the absent verification story (§8 #2).
 - **Next cycle is for:** closing M1 — palette, menu bar, toasts, op-store discipline, motion pass — and deciding question #2 before M2 puts real money through the run layer.

@@ -34,7 +34,7 @@ No test runner and no CI workflows yet — verification is the review bots plus 
 | Invoke | Skill | When |
 |--------|--------|------|
 | `/check-pr` | `.claude/skills/check-pr` | Triage Greptile/human PR comments + checks |
-| `/greploop` | `.claude/skills/greploop` | Iterate until Greptile 5/5 + zero unresolved |
+| `/greploop` | `.claude/skills/greploop` | Iterate until the score gate below is met with zero unresolved |
 | `/promptbench-review` | `.claude/skills/promptbench-review` | Project-shaped review loop (preferred entry) |
 
 Cursor and Codex discover the same skills via symlinks (`.cursor/skills/`, `.agents/skills/`). Do not duplicate skill bodies.
