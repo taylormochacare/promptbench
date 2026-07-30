@@ -7,9 +7,9 @@ interface LogoProps {
 function BenchmarkSquares() {
   return (
     <span className="logo-ots-mark flex h-[17px] items-end gap-0.5" aria-hidden>
-      <span className="logo-ots-r0 size-[9px] box-border rounded-[1px] border border-muted-foreground/55 bg-transparent origin-bottom" />
-      <span className="logo-ots-r1 size-[9px] box-border rounded-[1px] border border-muted-foreground/55 bg-transparent origin-bottom" />
-      <span className="logo-ots-r2 size-[9px] box-border rounded-[1px] border border-muted-foreground/55 bg-transparent origin-bottom" />
+      <span className="logo-ots-r0 logo-glass size-[9px] box-border rounded-[1px] border border-muted-foreground/55 origin-bottom" />
+      <span className="logo-ots-r1 logo-glass size-[9px] box-border rounded-[1px] border border-muted-foreground/55 origin-bottom" />
+      <span className="logo-ots-r2 logo-glass size-[9px] box-border rounded-[1px] border border-muted-foreground/55 origin-bottom" />
     </span>
   );
 }
@@ -28,13 +28,15 @@ function OutlineWordmark() {
 }
 
 function SolidPour() {
+  // Mirrors OutlineWordmark's inline markup exactly — same glyphs, same
+  // spaces — so the pour lands pixel-perfect on the outline.
   return (
     <span
       aria-hidden
-      className="pointer-events-none absolute top-0 left-0 inline-flex items-baseline gap-[0.15em] font-heading text-[13px] leading-none tracking-[-0.03em] whitespace-nowrap"
+      className="pointer-events-none absolute top-0 left-0 font-heading text-[13px] font-medium leading-none tracking-[-0.03em] whitespace-nowrap"
     >
-      <span className="logo-ots-p font-medium text-foreground opacity-0">prompt</span>
-      <span className="logo-ots-s text-[10px] font-normal text-foreground opacity-0">/</span>
+      <span className="logo-ots-p text-foreground opacity-0">prompt</span>
+      <span className="logo-ots-s text-[10px] font-normal text-foreground opacity-0"> / </span>
       <span className="logo-ots-b font-semibold text-foreground opacity-0">bench</span>
     </span>
   );
