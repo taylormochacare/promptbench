@@ -6,6 +6,7 @@ import { sessionStore } from "@/stores/session-store";
  * also appear in the native menu bar when it lands (step 5).
  *   ⌘\   rail          ⌘⌥\  split
  *   ⌘1/2 focus pane    ⌘W   close focused pane (only when split)
+ *   ⌘+/⌘- sheet zoom   ⌘0   reset zoom
  */
 export function useShellShortcuts() {
   useEffect(() => {
@@ -33,6 +34,23 @@ export function useShellShortcuts() {
       if (event.code === "KeyW" && panePages.length > 1) {
         event.preventDefault();
         sessionStore.closePane(focusedPane);
+        return;
+      }
+
+      // Sheet zoom — Equal covers ⌘= and ⌘+; Minus is ⌘-; Digit0 resets.
+      if (event.code === "Equal" || event.code === "NumpadAdd") {
+        event.preventDefault();
+        sessionStore.zoomIn();
+        return;
+      }
+      if (event.code === "Minus" || event.code === "NumpadSubtract") {
+        event.preventDefault();
+        sessionStore.zoomOut();
+        return;
+      }
+      if (event.code === "Digit0" || event.code === "Numpad0") {
+        event.preventDefault();
+        sessionStore.resetZoom();
       }
     };
     window.addEventListener("keydown", onKey);

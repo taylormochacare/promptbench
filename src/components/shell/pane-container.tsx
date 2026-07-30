@@ -78,7 +78,7 @@ function Pane({ index, split }: { index: number; split: boolean }) {
  * Divider: 1:1 drag, double-click resets 50/50, panes clamp at 360px.
  */
 export function PaneContainer() {
-  const { panePages, paneRatio } = useSession();
+  const { panePages, paneRatio, uiZoom } = useSession();
   const containerRef = useRef<HTMLDivElement>(null);
   const split = panePages.length > 1;
 
@@ -111,8 +111,12 @@ export function PaneContainer() {
   return (
     <main
       ref={containerRef}
-      className="flex min-h-0 flex-1 rounded-tl-lg bg-sheet"
-      style={{ boxShadow: "var(--shadow-seam)" }}
+      className="flex min-h-0 flex-1 origin-top-left rounded-tl-lg bg-sheet"
+      style={{
+        boxShadow: "var(--shadow-seam)",
+        // WKWebView supports CSS zoom; scales sheet content only (bench stays native).
+        zoom: uiZoom,
+      }}
     >
       <div
         className="min-w-0"

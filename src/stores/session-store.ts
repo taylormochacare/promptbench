@@ -12,12 +12,23 @@ export interface SessionState {
   panePages: (string | null)[];
   paneRatio: number; // width share of pane 0, 0.2–0.8
   focusedPane: number;
+  /** Sheet content zoom (not window chrome). 0.8–1.5, step 0.1. */
+  uiZoom: number;
 }
 
 const STORAGE_KEY = "promptbench:session:v1";
 
+export const UI_ZOOM_MIN = 0.8;
+export const UI_ZOOM_MAX = 1.5;
+export const UI_ZOOM_STEP = 0.1;
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+function clampZoom(value: number): number {
+  const stepped = Math.round(value / UI_ZOOM_STEP) * UI_ZOOM_STEP;
+  return clamp(Number(stepped.toFixed(1)), UI_ZOOM_MIN, UI_ZOOM_MAX);
 }
 
 const DEFAULTS: SessionState = {
@@ -26,6 +37,7 @@ const DEFAULTS: SessionState = {
   panePages: [null],
   paneRatio: 0.5,
   focusedPane: 0,
+  uiZoom: 1,
 };
 
 function load(): SessionState {
@@ -54,6 +66,9 @@ function load(): SessionState {
         0.8,
       ),
       focusedPane: parsed.focusedPane === 1 && panePages.length > 1 ? 1 : 0,
+      uiZoom: clampZoom(
+        typeof parsed.uiZoom === "number" ? parsed.uiZoom : DEFAULTS.uiZoom,
+      ),
     };
   } catch {
     return DEFAULTS;
@@ -107,6 +122,11 @@ export const sessionStore = {
     panePages[index] = pageId;
     set({ panePages });
   },
+
+  setUiZoom: (zoom: number) => set({ uiZoom: clampZoom(zoom) }),
+  zoomIn: () => set({ uiZoom: clampZoom(state.uiZoom + UI_ZOOM_STEP) }),
+  zoomOut: () => set({ uiZoom: clampZoom(state.uiZoom - UI_ZOOM_STEP) }),
+  resetZoom: () => set({ uiZoom: 1 }),
 };
 
 export function useSession(): SessionState {
