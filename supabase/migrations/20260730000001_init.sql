@@ -119,6 +119,53 @@ create index prompt_runs_analytics_idx on prompt_runs (user_id, model, created_a
 create unique index prompt_runs_one_best_per_version on prompt_runs (version_id)
   where is_best;
 
+-- prompt_runs.page_id is denormalized off version_id for cheap listing.
+-- Derive it on write so it can never disagree with the version's page —
+-- a wrong client value is overwritten, not trusted, not asserted-against.
+create or replace function prompt_runs_derive_page_id()
+returns trigger language plpgsql as $$
+begin
+  select page_id into strict new.page_id
+    from prompt_versions where id = new.version_id;
+  return new;
+end $$;
+
+create trigger prompt_runs_page_id_consistency
+  before insert or update of version_id, page_id on prompt_runs
+  for each row execute function prompt_runs_derive_page_id();
+
+-- Version numbers are per-page sequential. Reading max(number)+1 in the app
+-- races across concurrent sessions (two devices, same user); this RPC
+-- serializes committers per page with an advisory xact lock and assigns the
+-- number in the same transaction. Clients commit via RPC, never raw insert.
+create or replace function commit_prompt_version(
+  p_page_id uuid,
+  p_message text,
+  p_content jsonb,
+  p_schema_version integer,
+  p_bound_hash text default null,
+  p_git_head text default null,
+  p_git_dirty boolean default null
+) returns prompt_versions
+language plpgsql
+security invoker
+as $$
+declare
+  v prompt_versions;
+begin
+  perform pg_advisory_xact_lock(hashtextextended(p_page_id::text, 0));
+  insert into prompt_versions
+      (page_id, user_id, number, message, content, schema_version,
+       bound_hash, git_head, git_dirty)
+  select p_page_id, (select auth.uid()), coalesce(max(number), 0) + 1,
+         p_message, p_content, p_schema_version,
+         p_bound_hash, p_git_head, p_git_dirty
+    from prompt_versions
+   where page_id = p_page_id
+  returning * into v;
+  return v;
+end $$;
+
 -- Promoting a best run must clear the incumbent first or the partial unique
 -- index raises. This function owns that ordering in one transaction; clients
 -- call it via RPC instead of flipping is_best directly. Runs with invoker
