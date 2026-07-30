@@ -31,4 +31,4 @@ Not a Next.js app — do not suggest App Router / RSC patterns.
 
 ## Greptile
 
-Config: [`.greptile/`](../.greptile/). Trigger: `@greptile review`. Address with `/check-pr` / `/greploop`.
+Config: [`.greptile/`](../.greptile/). Trigger: `@greptile review`. Address with `/promptbench-review` (or `/check-pr` → `/greploop`). Skills live under `.claude/skills/` (symlinked for Cursor/Codex).
