@@ -1,0 +1,71 @@
+{
+  "strictness": 2,
+  "commentTypes": ["logic", "syntax"],
+  "triggerOnUpdates": true,
+  "statusCheck": true,
+  "fixWithAI": true,
+  "ignorePatterns": "pnpm-lock.yaml\nsrc-tauri/icons/**\ndist/**\n*.svg\n*.png\n*.icns\n*.ico",
+  "summarySection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": true
+  },
+  "issuesTableSection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": true
+  },
+  "confidenceScoreSection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": false
+  },
+  "sequenceDiagramSection": {
+    "included": false
+  },
+  "instructions": "promptbench is a Tauri 2 + React 19 + Vite macOS desktop app (pnpm). Dark-first native glass shell. Authoritative design: docs/design-direction.md. Not a Next.js app — do not suggest App Router/RSC patterns. Prefer logic and regression findings over style nits.",
+  "rules": [
+    {
+      "id": "tauri-no-settitle",
+      "rule": "Never call getCurrentWindow().setTitle() or Window.setTitle. setTitle resets custom trafficLightPosition on macOS (Tauri #13044). Keep title: \"\" and hiddenTitle: true in tauri.conf.json; page identity lives in-app.",
+      "scope": ["src/**/*.ts", "src/**/*.tsx", "src-tauri/**/*.rs"],
+      "severity": "high"
+    },
+    {
+      "id": "glass-budget",
+      "rule": "CSS backdrop-filter / blur is allowed only on command palette and menus/popovers (tokens --glass-palette / --glass-popover). Never add backdrop-filter on the sheet, bench, scroll containers, canvas, sticky headers, tooltips, or toasts. Idle window must have zero CSS blurs. Never transition backdrop-filter.",
+      "scope": ["src/**/*.css", "src/**/*.tsx", "src/**/*.ts"],
+      "severity": "high"
+    },
+    {
+      "id": "drag-region",
+      "rule": "Window dragging must use data-tauri-drag-region (deep on bench dead space). Do not reintroduce -webkit-app-region CSS — it is dead in WKWebView. Interactive controls must opt out correctly.",
+      "scope": ["src/**/*.tsx", "src/**/*.css", "src/**/*.ts"],
+      "severity": "high"
+    },
+    {
+      "id": "rls-userid",
+      "rule": "Supabase RLS must use auth.uid() = user_id equality (or equivalent). Never ship open/public write policies. workspace_id is an unused v1 seam — do not require it for access control yet.",
+      "scope": ["supabase/**"],
+      "severity": "high"
+    },
+    {
+      "id": "session-local",
+      "rule": "UI session state (pane layout, local repo roots, window chrome UI) stays machine-local. Never persist absolute local filesystem paths or machine-only session fields to Supabase.",
+      "scope": ["src/stores/**", "src/**/*.ts", "src/**/*.tsx"],
+      "severity": "high"
+    },
+    {
+      "id": "theme-settheme",
+      "rule": "Theme changes must call getCurrentWindow().setTheme(theme) alongside toggling the .dark class. Default theme is dark. Without setTheme, dark app + light OS shows wrong vibrancy material.",
+      "scope": ["src/components/theme*.tsx", "src/**/*theme*"],
+      "severity": "medium"
+    },
+    {
+      "id": "amber-budget",
+      "rule": "Brand amber (--primary, hue 50) marks state only: running, current version, selected icon, focus, primary button. Do not flood amber across underlines, handles, and every selected tree icon at once.",
+      "scope": ["src/**/*.css", "src/**/*.tsx"],
+      "severity": "low"
+    }
+  ]
+}
