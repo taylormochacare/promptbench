@@ -5,8 +5,9 @@ import { cn } from "@/lib/utils";
 
 /** The bench — strip. Mostly honest drag surface; global actions right. */
 export function Strip() {
-  const { railCollapsed, panePages } = useSession();
+  const { railCollapsed, panePages, uiZoom } = useSession();
   const split = panePages.length > 1;
+  const zoomLabel = `${Math.round(uiZoom * 100)}%`;
 
   return (
     <header
@@ -41,7 +42,18 @@ export function Strip() {
         )}
       </div>
       <div className="flex-1" />
-      <div data-tauri-drag-region="false">
+      <div className="flex items-center gap-2" data-tauri-drag-region="false">
+        {uiZoom !== 1 && (
+          <button
+            type="button"
+            aria-label={`Reset zoom (${zoomLabel})`}
+            title="Reset zoom ⌘0"
+            onClick={sessionStore.resetZoom}
+            className="rounded-[5px] px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-muted-foreground hover:bg-pill-hover active:bg-pill-selected"
+          >
+            {zoomLabel}
+          </button>
+        )}
         <ThemeSwitcher />
       </div>
     </header>
