@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Plus, Settings, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { SettingsTrigger } from "@/components/shell/settings-panel";
 import { PAGE_TYPES, pageDisplayTitle, pageTypeInfo } from "@/lib/page-types";
 import { sessionStore, useSession } from "@/stores/session-store";
 import { treeStore, useTree, type PageRow } from "@/stores/tree-store";
@@ -169,10 +170,10 @@ export function Rail() {
       </div>
 
       <div
-        className="mt-auto flex h-11 shrink-0 items-center px-4"
+        className="mt-auto flex h-11 shrink-0 items-center px-3"
         data-tauri-drag-region="false"
       >
-        <Settings className="size-4 text-sidebar-foreground/40" aria-hidden />
+        <SettingsTrigger tone="bench" />
       </div>
     </aside>
   );
