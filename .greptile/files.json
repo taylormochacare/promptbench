@@ -1,0 +1,32 @@
+{
+  "files": [
+    {
+      "path": "docs/review-conventions.md",
+      "description": "Stack, review priorities, and Greptile role"
+    },
+    {
+      "path": "docs/review-bots-setup.md",
+      "description": "How Greptile is configured for this repo"
+    },
+    {
+      "path": "src-tauri/tauri.conf.json",
+      "description": "Window chrome, materials, CSP, traffic lights",
+      "scope": ["src-tauri/**", "src/hooks/use-window-chrome.ts", "src/components/theme*.tsx"]
+    },
+    {
+      "path": "src-tauri/capabilities/default.json",
+      "description": "Tauri permission surface — keep minimal",
+      "scope": ["src-tauri/**"]
+    },
+    {
+      "path": "src/index.css",
+      "description": "Design tokens, sheet/bench layers, glass recipes",
+      "scope": ["src/**/*.css", "src/**/*.tsx"]
+    },
+    {
+      "path": "src/hooks/use-window-chrome.ts",
+      "description": "Overlay titlebar / traffic light / fullscreen chrome",
+      "scope": ["src/hooks/**", "src/components/shell/**", "src-tauri/**"]
+    }
+  ]
+}

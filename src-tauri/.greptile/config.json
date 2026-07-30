@@ -1,0 +1,18 @@
+{
+  "strictness": 1,
+  "commentTypes": ["logic", "syntax"],
+  "instructions": "Rust/Tauri layer: minimize capabilities, preserve transparent overlay titlebar semantics, never widen CSP or permissions without justification.",
+  "rules": [
+    {
+      "id": "capabilities-allowlist",
+      "rule": "Do not add broad Tauri permissions (fs, shell, http unrestricted, etc.) without a documented need. Prefer the smallest allowlist in capabilities/default.json. Flag new allow-* permissions that are unused by the frontend.",
+      "severity": "high"
+    },
+    {
+      "id": "window-effects",
+      "rule": "Keep macOS windowEffects using a single supported material (sidebar). Do not reintroduce mica/underWindowBackground stacks that fight first-supported-wins behavior.",
+      "scope": ["tauri.conf.json"],
+      "severity": "medium"
+    }
+  ]
+}

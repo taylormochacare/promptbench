@@ -1,0 +1,6 @@
+# Greptile MCP — uses GREPTILE_API_KEY from the environment (never commit the key).
+# Docs: https://www.greptile.com/docs/mcp/setup
+
+[mcp_servers.greptile]
+url = "https://api.greptile.com/mcp"
+bearer_token_env_var = "GREPTILE_API_KEY"

@@ -1,0 +1,22 @@
+{
+  "strictness": 1,
+  "commentTypes": ["logic", "syntax"],
+  "instructions": "SQL/migrations: preserve single-player RLS, immutable prompt_versions, soft-delete semantics. Content-blob migrations are TypeScript-side — do not invent raw SQL content rewrites unless intentional.",
+  "rules": [
+    {
+      "id": "prompt-versions-immutable",
+      "rule": "prompt_versions rows must remain immutable (no UPDATE of content). Runs reference versions permanently; never prune prompt_versions.",
+      "severity": "high"
+    },
+    {
+      "id": "soft-delete",
+      "rule": "pages use deleted_at soft delete. Prefer soft-delete over hard DELETE unless explicitly migrating trash purge.",
+      "severity": "medium"
+    },
+    {
+      "id": "no-open-rls",
+      "rule": "Every user-owned table must have RLS enabled with policies scoped to auth.uid() = user_id. Reject USING (true) write policies.",
+      "severity": "high"
+    }
+  ]
+}
