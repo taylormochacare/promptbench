@@ -1,23 +1,39 @@
 # promptbench — agent guide
 
-Tauri 2 + React 19 + Vite macOS desktop app (pnpm). Design authority: `docs/design-direction.md`. Review conventions: `docs/review-conventions.md`.
+Shared guide for **Cursor** and **Codex**. Claude Code should prefer [CLAUDE.md](./CLAUDE.md).
 
-## Review loop (Greptile)
+Tauri 2 + React 19 + Vite macOS desktop app (pnpm). Design: `docs/design-direction.md`. Review: `docs/review-conventions.md`. Setup: `docs/review-bots-setup.md`.
 
-1. Open / update a PR — wait for the `Greptile Review` check.
-2. Address feedback with `/check-pr`, then `/greploop` if chasing 5/5 with zero unresolved comments.
-3. Project standards live in `.greptile/` (cascading rules + `files.json` context).
+## Skill discovery (single source of truth)
 
-## Skills
+Canonical skill bodies live in **`.claude/skills/`** (Claude Code). Other harnesses resolve the same folders via symlinks:
 
-| Skill | Where |
-|-------|--------|
-| `/check-pr` | `.cursor/skills/check-pr`, `.claude/skills/check-pr` |
-| `/greploop` | `.cursor/skills/greploop`, `.claude/skills/greploop` |
+| Harness | Path |
+|---------|------|
+| Claude Code | `.claude/skills/{check-pr,greploop,promptbench-review}/` |
+| Cursor | `.cursor/skills/*` → `.claude/skills/*` (also scans `.claude/skills/` / `.agents/skills/`) |
+| Codex | `.agents/skills/*` → `.claude/skills/*` |
+
+Invoke `/promptbench-review`, `/check-pr`, or `/greploop` after Greptile posts on a PR.
+
+## Complementary Cursor skills (not vendored here)
+
+Use when relevant; they are Cursor built-ins / user skills:
+
+- **babysit** — keep a PR merge-ready (comments + CI loop); pairs with `/check-pr`
+- **create-skill** / **migrate-to-skills** — extend or migrate skills; keep bodies only under `.claude/skills/`
+- **create-rule** — persistent rules / AGENTS.md; prefer skills for on-demand workflows
+- **review-bugbot** — only if Bugbot is enabled (this repo’s review bot is Greptile)
 
 ## MCP
 
-Greptile HTTP MCP: `.cursor/mcp.json`, `.mcp.json`, `.codex/config.toml`. Requires `GREPTILE_API_KEY` in the environment (see `.env.example`). Never commit the key.
+| Harness | Config |
+|---------|--------|
+| Claude Code | `.mcp.json` (`servers` + `transport`) |
+| Cursor | `.cursor/mcp.json` (`mcpServers` + `type`) |
+| Codex | `.codex/config.toml` (`bearer_token_env_var`) |
+
+All use `GREPTILE_API_KEY` from the environment (see `.env.example`). Never commit the key.
 
 ## Hard constraints (do not violate)
 
